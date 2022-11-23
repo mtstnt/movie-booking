@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+option go_package = "movie/pb";
+
+service MovieService {
+  rpc GetMovies(GetMoviesRequest) returns (GetMoviesResponse) {}
+  rpc GetMovie(GetMovieRequest) returns (GetMovieResponse) {}
+  rpc CreateMovie(CreateMovieRequest) returns (CreateMovieResponse) {}
+  rpc UpdateMovie(UpdateMovieRequest) returns (UpdateMovieResponse) {}
+  rpc DeleteMovie(DeleteMovieRequest) returns (DeleteMovieResponse) {}
+}
+
+service DirectorService {
+  rpc GetDirectors(GetDirectorsRequest) returns (GetDirectorsResponse) {}
+  rpc GetDirector(GetDirectorRequest) returns (GetDirectorResponse) {}
+  rpc CreateDirector(CreateDirectorRequest) returns (CreateDirectorResponse) {}
+  rpc UpdateDirector(UpdateDirectorRequest) returns (UpdateDirectorResponse) {}
+  rpc DeleteDirector(DeleteDirectorRequest) returns (DeleteDirectorResponse) {}
+}
+
+service ActorService {
+  rpc GetActors(GetActorsRequest) returns (GetActorsResponse) {}
+  rpc GetActor(GetActorRequest) returns (GetActorResponse) {}
+  rpc CreateActor(CreateActorRequest) returns (CreateActorResponse) {}
+  rpc UpdateDirector(UpdateActorRequest) returns (UpdateActorResponse) {}
+  rpc DeleteActor(DeleteActorRequest) returns (DeleteActorResponse) {}
+}
+
+message Director {
+  uint32 id = 1;
+  string name =  2;
+}
+
+message Actor {
+  uint32 id = 1;
+  string name = 2;
+}
+
+message Movie {
+  uint32 id = 1;
+  string title = 2;
+  string synopsis = 3;
+  int64 releaseDate = 4;
+  optional Director director = 5;
+  repeated Actor casts = 6;
+}
+
+message GetMoviesRequest {}
+message GetMoviesResponse {
+  repeated Movie movies = 1;
+}
+
+message GetMovieRequest {
+  uint32 id = 1;
+}
+message GetMovieResponse {
+  optional Movie movie = 1;
+}
+
+message CreateMovieRequest {
+  string title = 2;
+  string synopsis = 3;
+  int64 releaseDate = 4;
+  optional Director director = 5;
+  repeated Actor casts = 6;
+}
+message CreateMovieResponse {
+  Movie movie = 1;
+}
+
+message UpdateMovieRequest {
+  uint32 id = 1;
+  optional string title = 2;
+  optional string synopsis = 3;
+  optional int64 releaseDate = 4;
+  optional Director director = 5;
+  repeated Actor casts = 6;
+}
+message UpdateMovieResponse {
+  Movie movie = 1;
+}
+
+message DeleteMovieRequest {
+  uint32 id = 1;
+}
+message DeleteMovieResponse {}
+
+message GetDirectorsRequest {}
+message GetDirectorsResponse {
+  repeated Director directors = 1;
+}
+
+message GetDirectorRequest {
+  uint32 id = 1;
+}
+message GetDirectorResponse {
+  optional Director director = 1;
+}
+
+message CreateDirectorRequest {
+  string name = 1;
+}
+message CreateDirectorResponse {
+  Director director = 1;
+}
+
+message UpdateDirectorRequest {
+  uint32 id = 1;
+  optional string name = 2;
+}
+message UpdateDirectorResponse {
+  Director director = 1;
+}
+
+message DeleteDirectorRequest {
+  uint32 id = 1;
+}
+message DeleteDirectorResponse {}
+
+message GetActorsRequest {}
+message GetActorsResponse {
+  uint32 id = 1;
+}
+
+message GetActorRequest {
+  uint32 id = 1;
+}
+message GetActorResponse {
+  optional Actor actor = 1;
+}
+
+message CreateActorRequest {
+  string name = 1;
+}
+message CreateActorResponse {
+  Actor actor = 1;
+}
+
+message UpdateActorRequest {
+  uint32 id = 1;
+  optional string name = 2;
+}
+message UpdateActorResponse {
+  Actor actor = 1;
+}
+
+message DeleteActorRequest {
+  uint32 id = 1;
+}
+message DeleteActorResponse {}

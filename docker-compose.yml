@@ -1,0 +1,48 @@
+version: '3'
+services:
+  gateway:
+    build: "./services/gateway"
+    ports:
+      - 8000:8000
+
+  redis:
+    image: redis:7.0.2-alpine3.16
+
+  users:
+    build: "./services/user"
+    depends_on:
+      - users_db
+
+  users_db:
+    image: postgres:14.3-alpine3.16
+    environment:
+      - POSTGRES_USER=users
+      - POSTGRES_PASSWORD=users
+      - POSTGRES_DB=users
+  
+  # employees:
+  #   build: './services/employee'
+  # employees_db:
+  #   image: postgres:14.3-alpine3.16
+  #   environment:
+  #     - POSTGRES_USER=employees
+  #     - POSTGRES_PASSWORD=employees
+  #     - POSTGRES_DB=employees
+
+  # booking:
+  #   build: './services/booking'
+  # booking_db:
+  #   image: postgres:14.3-alpine3.16
+  #   environment:
+  #     - POSTGRES_USER=bookings
+  #     - POSTGRES_PASSWORD=bookings
+  #     - POSTGRES_DB=bookings
+
+  # movie:
+  #   build: './services/movie'
+  # movie_db:
+  #   image: postgres:14.3-alpine3.16
+  #   environment:
+  #     - POSTGRES_USER=movies
+  #     - POSTGRES_PASSWORD=movies
+  #     - POSTGRES_DB=movies

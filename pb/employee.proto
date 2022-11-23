@@ -1,0 +1,60 @@
+syntax = "proto3";
+option go_package = "movie/pb";
+
+service EmployeeService {
+  rpc GetEmployees(GetEmployeesRequest) returns (GetEmployeesResponse) {}
+  rpc GetEmployee(GetEmployeeRequest) returns (GetEmployeeResponse) {}
+  rpc CreateEmployee(CreateEmployeeRequest) returns (CreateEmployeeResponse) {}
+  rpc UpdateEmployee(UpdateEmployeeRequest) returns (UpdateEmployeeResponse) {}
+  rpc DeleteEmployee(DeleteEmployeeRequest) returns (DeleteEmployeeResponse) {}
+
+  rpc AuthenticateUser(AuthenticateEmployeeRequest) returns (AuthenticateEmployeeResponse) {}
+}
+
+message Employee {
+  uint32 id = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message GetEmployeesRequest {}
+message GetEmployeesResponse {
+  repeated Employee employees = 1;
+}
+
+message GetEmployeeRequest {
+  uint32 id = 1;
+}
+message GetEmployeeResponse {
+  optional Employee employee = 1;
+}
+
+message CreateEmployeeRequest {
+  string username = 1;
+  string password = 2;
+}
+message CreateEmployeeResponse {
+  Employee employee = 1;  
+}
+
+message UpdateEmployeeRequest {
+  uint32 id = 1;
+  optional string username = 2;
+  optional string password = 3;
+}
+message UpdateEmployeeResponse {
+  Employee employee = 1;
+}
+
+message DeleteEmployeeRequest {
+  uint32 id = 1;
+}
+message DeleteEmployeeResponse {}
+
+message AuthenticateEmployeeRequest {
+  string username = 1;
+  string password = 2;
+}
+message AuthenticateEmployeeResponse {
+  optional Employee employee = 1;
+}

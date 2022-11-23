@@ -1,0 +1,10 @@
+go 1.19
+
+use (
+  "services/booking"
+  "services/user"
+  "services/movie"
+  "services/employee"
+  "services/gateway"
+  "services/notification"
+)

@@ -1,0 +1,19 @@
+POST /api/v1/users/signup
+Host: localhost:8000
+Content-Type: application/json
+
+{
+  "Email": "test@mail.com",
+  "Name": "testuser",
+  "Password": "123456"
+}
+
+####
+POST /api/v1/users/signin
+Host: localhost:8000
+Content-Type: application/json
+
+{
+  "Email": "test@mail.com",
+  "Password": "123456"
+}
