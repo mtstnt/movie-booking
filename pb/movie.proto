@@ -22,7 +22,7 @@ service ActorService {
   rpc GetActors(GetActorsRequest) returns (GetActorsResponse) {}
   rpc GetActor(GetActorRequest) returns (GetActorResponse) {}
   rpc CreateActor(CreateActorRequest) returns (CreateActorResponse) {}
-  rpc UpdateDirector(UpdateActorRequest) returns (UpdateActorResponse) {}
+  rpc UpdateActor(UpdateActorRequest) returns (UpdateActorResponse) {}
   rpc DeleteActor(DeleteActorRequest) returns (DeleteActorResponse) {}
 }
 
@@ -40,8 +40,8 @@ message Movie {
   uint32 id = 1;
   string title = 2;
   string synopsis = 3;
-  int64 releaseDate = 4;
-  optional Director director = 5;
+  uint64 releaseDate = 4;
+  Director director = 5;
   repeated Actor casts = 6;
 }
 
@@ -60,9 +60,9 @@ message GetMovieResponse {
 message CreateMovieRequest {
   string title = 2;
   string synopsis = 3;
-  int64 releaseDate = 4;
-  optional Director director = 5;
-  repeated Actor casts = 6;
+  uint64 releaseDate = 4;
+  uint32 directorID = 5;
+  repeated uint32 castsID = 6;
 }
 message CreateMovieResponse {
   Movie movie = 1;
@@ -72,9 +72,9 @@ message UpdateMovieRequest {
   uint32 id = 1;
   optional string title = 2;
   optional string synopsis = 3;
-  optional int64 releaseDate = 4;
-  optional Director director = 5;
-  repeated Actor casts = 6;
+  optional uint64 releaseDate = 4;
+  optional uint32 directorID = 5;
+  repeated uint32 castsID = 6;
 }
 message UpdateMovieResponse {
   Movie movie = 1;
@@ -119,7 +119,7 @@ message DeleteDirectorResponse {}
 
 message GetActorsRequest {}
 message GetActorsResponse {
-  uint32 id = 1;
+  repeated Actor actors = 1;
 }
 
 message GetActorRequest {

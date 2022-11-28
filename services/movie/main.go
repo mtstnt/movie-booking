@@ -1,33 +1,14 @@
 package main
 
 import (
-	"context"
 	"log"
-	"movie/gateway/pb"
+	"movie/movie/pb"
+	"net"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"google.golang.org/grpc"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
-
-type MovieServer struct {
-	pb.UnimplementedMovieServiceServer
-}
-
-func (MovieServer) GetMovies(context.Context, pb.GetMoviesRequest) (*pb.GetMoviesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMovies not implemented")
-}
-func (MovieServer) GetMovie(context.Context, pb.GetMovieRequest) (*pb.GetMovieResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMovie not implemented")
-}
-func (MovieServer) CreateMovie(context.Context, pb.CreateMovieRequest) (*pb.CreateMovieResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateMovie not implemented")
-}
-func (MovieServer) UpdateMovie(context.Context, pb.UpdateMovieRequest) (*pb.UpdateMovieResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateMovie not implemented")
-}
-func (MovieServer) DeleteMovie(context.Context, pb.DeleteMovieRequest) (*pb.DeleteMovieResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteMovie not implemented")
-}
 
 func main() {
 	if err := run(); err != nil {
@@ -36,12 +17,30 @@ func main() {
 }
 
 func run() error {
-	// listener, err := net.Listen("tcp", "0.0.0.0:5000")
-	// if err != nil {
-	// 	return err
-	// }
+	listener, err := net.Listen("tcp", "0.0.0.0:5000")
+	if err != nil {
+		return err
+	}
 
-	// grpcServer, err := "", errors.New("")
+	db, err := gorm.Open(
+		postgres.Open("host=movies_db user=movies password=movies dbname=movies port=5432 TimeZone=Asia/Jakarta"),
+	)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	if err := db.AutoMigrate(Director{}, Actor{}, Movie{}); err != nil {
+		return err
+	}
+
+	movieRepository := NewRepository(db)
+	movieServer := NewServer(movieRepository)
+
+	var opts []grpc.ServerOption
+	grpcServer := grpc.NewServer(opts...)
+
+	pb.RegisterMovieServiceServer(grpcServer, movieServer)
+
+	log.Println("Running GRPC Server at port 8000")
+	return grpcServer.Serve(listener)
 }

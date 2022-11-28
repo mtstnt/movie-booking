@@ -19,7 +19,7 @@ var (
 	// Rpc Service -> [Sub-service Grpc Services]
 	ServiceHosts = []string{
 		"users",
-		// "movies",
+		"movies",
 		// "employees",
 		// "bookings",
 		// "notifications",
@@ -46,17 +46,17 @@ func run() error {
 	}
 
 	userClient := pb.NewUserServiceClient(conns["users"])
-	// employeeClient := pb.NewEmployeeServiceClient(conns["employee"])
-	// movieClient := pb.NewMovieServiceClient(conns["movie"])
+	movieClient := pb.NewMovieServiceClient(conns["movie"])
+	employeeClient := pb.NewEmployeeServiceClient(conns["employee"])
 
 	userHandler := handlers.NewUser(userClient, redisClient)
-	// movieHandler := handlers.NewMovie(employeeClient, movieClient)
-	// employeeHandler := handlers.NewEmployee(employeeClient, redisClient)
-
-	// _ = employeeHandler
+	movieHandler := handlers.NewMovie(employeeClient, movieClient)
+	employeeHandler := handlers.NewEmployee(employeeClient, redisClient)
 
 	userAuthenticatorMiddleware := filters.AuthenticatedAsUser(userClient, redisClient)
-	// employeeAuthenticatorMiddleware := filters.AuthenticatedAsEmployee(employeeClient)
+	employeeAuthenticatorMiddleware := filters.AuthenticatedAsEmployee(employeeClient)
+
+	_ = employeeHandler
 
 	router := gin.Default()
 	rg := router.Group("/api/v1")
@@ -66,9 +66,9 @@ func run() error {
 			POST("/signin", userHandler.SignIn).
 			POST("/signup", userHandler.SignUp)
 
-		// rg.Group("/users").
-		// 	Use(employeeAuthenticatorMiddleware).
-		// 	GET("/", userHandler.GetAllUsers)
+		rg.Group("/users").
+			Use(employeeAuthenticatorMiddleware).
+			GET("/", userHandler.GetAllUsers)
 
 		rg.Group("/users").
 			Use(userAuthenticatorMiddleware).
@@ -78,21 +78,21 @@ func run() error {
 	}
 
 	{
-		// rg.Group("/movies").
-		// 	GET("/", movieHandler.GetMovies).
-		// 	GET("/:id", movieHandler.GetMovie)
+		rg.Group("/movies").
+			GET("/", movieHandler.GetMovies).
+			GET("/:id", movieHandler.GetMovie)
 
-		// rg.Group("/movies").
-		// 	Use(filters.AuthenticatedAsEmployee(employeeClient)).
-		// 	POST("/", movieHandler.CreateMovie).
-		// 	PUT("/:id", movieHandler.UpdateMovie).
-		// 	DELETE("/:id", movieHandler.DeleteMovie)
+		rg.Group("/movies").
+			Use(filters.AuthenticatedAsEmployee(employeeClient)).
+			POST("/", movieHandler.CreateMovie).
+			PUT("/:id", movieHandler.UpdateMovie).
+			DELETE("/:id", movieHandler.DeleteMovie)
 	}
 
 	{
 		// rg.Group("/employees").
-		// 	GET("/", movieHandler.GetMovies).
-		// 	GET("/:id", movieHandler.GetMovie)
+		// 	GET("/", employeeHandler.Get).
+		// 	GET("/:id", employeeHandler.GetMovie)
 
 		// rg.Group("/employees").
 		// 	Use(filters.AuthenticatedAsEmployee(employeeClient)).

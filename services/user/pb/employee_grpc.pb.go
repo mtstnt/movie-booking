@@ -27,7 +27,7 @@ type EmployeeServiceClient interface {
 	CreateEmployee(ctx context.Context, in *CreateEmployeeRequest, opts ...grpc.CallOption) (*CreateEmployeeResponse, error)
 	UpdateEmployee(ctx context.Context, in *UpdateEmployeeRequest, opts ...grpc.CallOption) (*UpdateEmployeeResponse, error)
 	DeleteEmployee(ctx context.Context, in *DeleteEmployeeRequest, opts ...grpc.CallOption) (*DeleteEmployeeResponse, error)
-	AuthenticateUser(ctx context.Context, in *AuthenticateEmployeeRequest, opts ...grpc.CallOption) (*AuthenticateEmployeeResponse, error)
+	AuthenticateEmployee(ctx context.Context, in *AuthenticateEmployeeRequest, opts ...grpc.CallOption) (*AuthenticateEmployeeResponse, error)
 }
 
 type employeeServiceClient struct {
@@ -83,9 +83,9 @@ func (c *employeeServiceClient) DeleteEmployee(ctx context.Context, in *DeleteEm
 	return out, nil
 }
 
-func (c *employeeServiceClient) AuthenticateUser(ctx context.Context, in *AuthenticateEmployeeRequest, opts ...grpc.CallOption) (*AuthenticateEmployeeResponse, error) {
+func (c *employeeServiceClient) AuthenticateEmployee(ctx context.Context, in *AuthenticateEmployeeRequest, opts ...grpc.CallOption) (*AuthenticateEmployeeResponse, error) {
 	out := new(AuthenticateEmployeeResponse)
-	err := c.cc.Invoke(ctx, "/EmployeeService/AuthenticateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/EmployeeService/AuthenticateEmployee", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ type EmployeeServiceServer interface {
 	CreateEmployee(context.Context, *CreateEmployeeRequest) (*CreateEmployeeResponse, error)
 	UpdateEmployee(context.Context, *UpdateEmployeeRequest) (*UpdateEmployeeResponse, error)
 	DeleteEmployee(context.Context, *DeleteEmployeeRequest) (*DeleteEmployeeResponse, error)
-	AuthenticateUser(context.Context, *AuthenticateEmployeeRequest) (*AuthenticateEmployeeResponse, error)
+	AuthenticateEmployee(context.Context, *AuthenticateEmployeeRequest) (*AuthenticateEmployeeResponse, error)
 	mustEmbedUnimplementedEmployeeServiceServer()
 }
 
@@ -124,8 +124,8 @@ func (UnimplementedEmployeeServiceServer) UpdateEmployee(context.Context, *Updat
 func (UnimplementedEmployeeServiceServer) DeleteEmployee(context.Context, *DeleteEmployeeRequest) (*DeleteEmployeeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEmployee not implemented")
 }
-func (UnimplementedEmployeeServiceServer) AuthenticateUser(context.Context, *AuthenticateEmployeeRequest) (*AuthenticateEmployeeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateUser not implemented")
+func (UnimplementedEmployeeServiceServer) AuthenticateEmployee(context.Context, *AuthenticateEmployeeRequest) (*AuthenticateEmployeeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateEmployee not implemented")
 }
 func (UnimplementedEmployeeServiceServer) mustEmbedUnimplementedEmployeeServiceServer() {}
 
@@ -230,20 +230,20 @@ func _EmployeeService_DeleteEmployee_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EmployeeService_AuthenticateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EmployeeService_AuthenticateEmployee_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AuthenticateEmployeeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EmployeeServiceServer).AuthenticateUser(ctx, in)
+		return srv.(EmployeeServiceServer).AuthenticateEmployee(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/EmployeeService/AuthenticateUser",
+		FullMethod: "/EmployeeService/AuthenticateEmployee",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmployeeServiceServer).AuthenticateUser(ctx, req.(*AuthenticateEmployeeRequest))
+		return srv.(EmployeeServiceServer).AuthenticateEmployee(ctx, req.(*AuthenticateEmployeeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -276,8 +276,8 @@ var EmployeeService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EmployeeService_DeleteEmployee_Handler,
 		},
 		{
-			MethodName: "AuthenticateUser",
-			Handler:    _EmployeeService_AuthenticateUser_Handler,
+			MethodName: "AuthenticateEmployee",
+			Handler:    _EmployeeService_AuthenticateEmployee_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

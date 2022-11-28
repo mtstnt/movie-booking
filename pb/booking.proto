@@ -1,0 +1,94 @@
+syntax = "proto3";
+option go_package = "movie/pb";
+
+service ScheduleService {
+  rpc GetSchedules(GetSchedulesRequest) returns (GetSchedulesResponse) {}
+  rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
+  rpc CreateSchedule(CreateScheduleRequest) returns (CreateScheduleResponse) {}
+  rpc UpdateSchedule(UpdateScheduleRequest) returns (UpdateScheduleResponse) {}
+  rpc DeleteSchedule(DeleteScheduleRequest) returns (DeleteScheduleResponse) {}
+}
+
+service BookingService {
+  rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {}
+  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
+  rpc GetUserBookings(GetUserBookingsRequest) returns (GetUserBookingsResponse) {}
+}
+
+message Schedule {
+  uint32 id = 1;
+  uint32 movieID = 2;
+  uint32 studioNo = 3;
+  uint32 capacity = 4;
+  uint32 booked = 5;
+}
+
+message Booking {
+  uint32 id = 1;
+  uint32 userID = 2;
+  uint32 scheduleID = 3;
+}
+
+message CreateBookingRequest {
+  uint32 userID = 1;
+  uint32 scheduleID = 2;
+}
+message CreateBookingResponse {
+  Booking booking = 1;
+}
+
+message UpdateBookingRequest {
+  uint32 bookingID = 1;
+  uint32 userID = 2;
+  uint32 scheduleID = 3;
+}
+message UpdateBookingResponse {
+  Booking booking = 1;
+}
+
+message CancelBookingRequest {
+  uint32 bookingID = 1;
+}
+message CancelBookingResponse {}
+
+message GetUserBookingsRequest {
+  uint32 userID = 1;
+}
+message GetUserBookingsResponse {
+  repeated Booking bookings = 1;
+}
+
+message GetSchedulesRequest {
+  
+}
+message GetSchedulesResponse {
+  
+}
+
+message GetScheduleRequest {
+  
+}
+message GetScheduleResponse {
+  
+}
+
+message CreateScheduleRequest {
+  
+}
+message CreateScheduleResponse {
+  
+}
+
+message UpdateScheduleRequest {
+  
+}
+message UpdateScheduleResponse {
+  
+}
+
+message DeleteScheduleRequest {
+  
+}
+message DeleteScheduleResponse {
+  
+}

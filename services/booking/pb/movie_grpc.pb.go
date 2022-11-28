@@ -485,7 +485,7 @@ type ActorServiceClient interface {
 	GetActors(ctx context.Context, in *GetActorsRequest, opts ...grpc.CallOption) (*GetActorsResponse, error)
 	GetActor(ctx context.Context, in *GetActorRequest, opts ...grpc.CallOption) (*GetActorResponse, error)
 	CreateActor(ctx context.Context, in *CreateActorRequest, opts ...grpc.CallOption) (*CreateActorResponse, error)
-	UpdateActor(ctx context.Context, in *UpdateActorRequest, opts ...grpc.CallOption) (*UpdateActorResponse, error)
+	UpdateDirector(ctx context.Context, in *UpdateActorRequest, opts ...grpc.CallOption) (*UpdateActorResponse, error)
 	DeleteActor(ctx context.Context, in *DeleteActorRequest, opts ...grpc.CallOption) (*DeleteActorResponse, error)
 }
 
@@ -524,9 +524,9 @@ func (c *actorServiceClient) CreateActor(ctx context.Context, in *CreateActorReq
 	return out, nil
 }
 
-func (c *actorServiceClient) UpdateActor(ctx context.Context, in *UpdateActorRequest, opts ...grpc.CallOption) (*UpdateActorResponse, error) {
+func (c *actorServiceClient) UpdateDirector(ctx context.Context, in *UpdateActorRequest, opts ...grpc.CallOption) (*UpdateActorResponse, error) {
 	out := new(UpdateActorResponse)
-	err := c.cc.Invoke(ctx, "/ActorService/UpdateActor", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ActorService/UpdateDirector", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -549,7 +549,7 @@ type ActorServiceServer interface {
 	GetActors(context.Context, *GetActorsRequest) (*GetActorsResponse, error)
 	GetActor(context.Context, *GetActorRequest) (*GetActorResponse, error)
 	CreateActor(context.Context, *CreateActorRequest) (*CreateActorResponse, error)
-	UpdateActor(context.Context, *UpdateActorRequest) (*UpdateActorResponse, error)
+	UpdateDirector(context.Context, *UpdateActorRequest) (*UpdateActorResponse, error)
 	DeleteActor(context.Context, *DeleteActorRequest) (*DeleteActorResponse, error)
 	mustEmbedUnimplementedActorServiceServer()
 }
@@ -567,8 +567,8 @@ func (UnimplementedActorServiceServer) GetActor(context.Context, *GetActorReques
 func (UnimplementedActorServiceServer) CreateActor(context.Context, *CreateActorRequest) (*CreateActorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateActor not implemented")
 }
-func (UnimplementedActorServiceServer) UpdateActor(context.Context, *UpdateActorRequest) (*UpdateActorResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateActor not implemented")
+func (UnimplementedActorServiceServer) UpdateDirector(context.Context, *UpdateActorRequest) (*UpdateActorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDirector not implemented")
 }
 func (UnimplementedActorServiceServer) DeleteActor(context.Context, *DeleteActorRequest) (*DeleteActorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteActor not implemented")
@@ -640,20 +640,20 @@ func _ActorService_CreateActor_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ActorService_UpdateActor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ActorService_UpdateDirector_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateActorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ActorServiceServer).UpdateActor(ctx, in)
+		return srv.(ActorServiceServer).UpdateDirector(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ActorService/UpdateActor",
+		FullMethod: "/ActorService/UpdateDirector",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActorServiceServer).UpdateActor(ctx, req.(*UpdateActorRequest))
+		return srv.(ActorServiceServer).UpdateDirector(ctx, req.(*UpdateActorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -696,8 +696,8 @@ var ActorService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ActorService_CreateActor_Handler,
 		},
 		{
-			MethodName: "UpdateActor",
-			Handler:    _ActorService_UpdateActor_Handler,
+			MethodName: "UpdateDirector",
+			Handler:    _ActorService_UpdateDirector_Handler,
 		},
 		{
 			MethodName: "DeleteActor",

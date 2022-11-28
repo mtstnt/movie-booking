@@ -8,7 +8,7 @@ service EmployeeService {
   rpc UpdateEmployee(UpdateEmployeeRequest) returns (UpdateEmployeeResponse) {}
   rpc DeleteEmployee(DeleteEmployeeRequest) returns (DeleteEmployeeResponse) {}
 
-  rpc AuthenticateUser(AuthenticateEmployeeRequest) returns (AuthenticateEmployeeResponse) {}
+  rpc AuthenticateEmployee(AuthenticateEmployeeRequest) returns (AuthenticateEmployeeResponse) {}
 }
 
 message Employee {
