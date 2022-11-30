@@ -1,10 +1,11 @@
-# Hotle
-Hotel management system microservices project.
+# Movie Booking Microservices Project
 
-A system to help manage various aspects of the hotel. 
-Consists of 4 domains:
-- Employees
-- Customers
-- Reservation
-- Working Shift 
-and uses a single REST gateway that is opened to public network.
+Mini-project of a movie booking system.
+
+Consists of 6 services:
+- Gateway
+- Movie
+- Employee
+- User
+- Bookings
+- Notification -> Not implemented yet.
