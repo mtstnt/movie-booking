@@ -16,13 +16,12 @@ import (
 type GrpcConnMap map[string]*grpc.ClientConn
 
 var (
-	// Rpc Service -> [Sub-service Grpc Services]
 	ServiceHosts = []string{
 		"users",
 		"movies",
-		// "employees",
-		// "bookings",
-		// "notifications",
+		"employees",
+		"bookings",
+		// "notifications", -> Still todo.
 	}
 )
 
@@ -46,17 +45,17 @@ func run() error {
 	}
 
 	userClient := pb.NewUserServiceClient(conns["users"])
-	movieClient := pb.NewMovieServiceClient(conns["movie"])
-	employeeClient := pb.NewEmployeeServiceClient(conns["employee"])
+	movieClient := pb.NewMovieServiceClient(conns["movies"])
+	employeeClient := pb.NewEmployeeServiceClient(conns["employees"])
+	bookingClient := pb.NewBookingServiceClient(conns["bookings"])
 
 	userHandler := handlers.NewUser(userClient, redisClient)
 	movieHandler := handlers.NewMovie(employeeClient, movieClient)
 	employeeHandler := handlers.NewEmployee(employeeClient, redisClient)
+	bookingHandler := handlers.NewBooking(bookingClient)
 
 	userAuthenticatorMiddleware := filters.AuthenticatedAsUser(userClient, redisClient)
 	employeeAuthenticatorMiddleware := filters.AuthenticatedAsEmployee(employeeClient)
-
-	_ = employeeHandler
 
 	router := gin.Default()
 	rg := router.Group("/api/v1")
@@ -90,15 +89,23 @@ func run() error {
 	}
 
 	{
-		// rg.Group("/employees").
-		// 	GET("/", employeeHandler.Get).
-		// 	GET("/:id", employeeHandler.GetMovie)
+		rg.Group("/employees").
+			Use(filters.AuthenticatedAsEmployee(employeeClient)).
+			GET("/", employeeHandler.GetAllEmployees).
+			GET("/:id", employeeHandler.GetEmployee).
+			POST("/", employeeHandler.CreateEmployee).
+			PUT("/:id", employeeHandler.UpdateEmployee).
+			DELETE("/:id", employeeHandler.DeleteEmployee)
+	}
 
-		// rg.Group("/employees").
-		// 	Use(filters.AuthenticatedAsEmployee(employeeClient)).
-		// 	POST("/", movieHandler.CreateMovie).
-		// 	PUT("/:id", movieHandler.UpdateMovie).
-		// 	DELETE("/:id", movieHandler.DeleteMovie)
+	{
+		rg.Group("/bookings").
+			Use(filters.AuthenticatedAsUser(userClient, redisClient)).
+			GET("/", bookingHandler.GetUserBookings).
+			GET("/:id", bookingHandler.GetBooking).
+			POST("/", bookingHandler.CreateBooking).
+			PUT("/:id", bookingHandler.UpdateBooking).
+			DELETE("/:id", bookingHandler.CancelBooking)
 	}
 
 	return router.Run("0.0.0.0:8000")

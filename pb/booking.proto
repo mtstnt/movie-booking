@@ -10,9 +10,9 @@ service ScheduleService {
 }
 
 service BookingService {
+  rpc GetUserBookings(GetUserBookingsRequest) returns (GetUserBookingsResponse) {}
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {}
   rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
-  rpc GetUserBookings(GetUserBookingsRequest) returns (GetUserBookingsResponse) {}
 }
 
 message Schedule {
@@ -21,12 +21,14 @@ message Schedule {
   uint32 studioNo = 3;
   uint32 capacity = 4;
   uint32 booked = 5;
+  uint64 showTime = 6;
 }
 
 message Booking {
   uint32 id = 1;
   uint32 userID = 2;
   uint32 scheduleID = 3;
+  bool isCanceled = 4;
 }
 
 message CreateBookingRequest {
@@ -53,42 +55,54 @@ message CancelBookingResponse {}
 
 message GetUserBookingsRequest {
   uint32 userID = 1;
+  uint64 from = 2;
+  uint64 to = 3;
+  uint32 movieID = 4;
 }
 message GetUserBookingsResponse {
   repeated Booking bookings = 1;
 }
 
 message GetSchedulesRequest {
-  
+  uint64 from =  1;
+  uint64 to = 2;
+  uint32 movieID = 3;
 }
 message GetSchedulesResponse {
-  
+  repeated Schedule schedules = 1;
 }
 
 message GetScheduleRequest {
-  
+  uint32 id = 1;
 }
 message GetScheduleResponse {
-  
+  Schedule schedule = 1;
 }
 
 message CreateScheduleRequest {
-  
+  uint32 movieID = 1;
+  uint32 studioNo = 2;
+  uint32 capacity = 3;
+  uint32 booked = 4;
+  uint64 showTime = 5;
 }
 message CreateScheduleResponse {
-  
+  Schedule schedule = 1;
 }
 
 message UpdateScheduleRequest {
-  
+  uint32 id = 1;
+  optional uint32 movieID = 2;
+  optional uint32 studioNo = 3;
+  optional uint32 capacity = 4;
+  optional uint32 booked = 5;
+  optional uint64 showTime = 6;
 }
 message UpdateScheduleResponse {
-  
+  Schedule schedule = 1;
 }
 
 message DeleteScheduleRequest {
-  
+  uint32 id = 1;
 }
-message DeleteScheduleResponse {
-  
-}
+message DeleteScheduleResponse { }

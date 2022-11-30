@@ -63,7 +63,7 @@ func (e Employee) SignIn(ctx *gin.Context) {
 	})
 }
 
-func (e Employee) SignUp(ctx *gin.Context) {
+func (e Employee) CreateEmployee(ctx *gin.Context) {
 	var req struct {
 		Username string
 		Password string

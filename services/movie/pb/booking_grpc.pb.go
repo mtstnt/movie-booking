@@ -252,9 +252,9 @@ var ScheduleService_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookingServiceClient interface {
+	GetUserBookings(ctx context.Context, in *GetUserBookingsRequest, opts ...grpc.CallOption) (*GetUserBookingsResponse, error)
 	CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*CreateBookingResponse, error)
 	CancelBooking(ctx context.Context, in *CancelBookingRequest, opts ...grpc.CallOption) (*CancelBookingResponse, error)
-	GetUserBookings(ctx context.Context, in *GetUserBookingsRequest, opts ...grpc.CallOption) (*GetUserBookingsResponse, error)
 }
 
 type bookingServiceClient struct {
@@ -263,6 +263,15 @@ type bookingServiceClient struct {
 
 func NewBookingServiceClient(cc grpc.ClientConnInterface) BookingServiceClient {
 	return &bookingServiceClient{cc}
+}
+
+func (c *bookingServiceClient) GetUserBookings(ctx context.Context, in *GetUserBookingsRequest, opts ...grpc.CallOption) (*GetUserBookingsResponse, error) {
+	out := new(GetUserBookingsResponse)
+	err := c.cc.Invoke(ctx, "/BookingService/GetUserBookings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *bookingServiceClient) CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*CreateBookingResponse, error) {
@@ -283,22 +292,13 @@ func (c *bookingServiceClient) CancelBooking(ctx context.Context, in *CancelBook
 	return out, nil
 }
 
-func (c *bookingServiceClient) GetUserBookings(ctx context.Context, in *GetUserBookingsRequest, opts ...grpc.CallOption) (*GetUserBookingsResponse, error) {
-	out := new(GetUserBookingsResponse)
-	err := c.cc.Invoke(ctx, "/BookingService/GetUserBookings", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // BookingServiceServer is the server API for BookingService service.
 // All implementations must embed UnimplementedBookingServiceServer
 // for forward compatibility
 type BookingServiceServer interface {
+	GetUserBookings(context.Context, *GetUserBookingsRequest) (*GetUserBookingsResponse, error)
 	CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error)
 	CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error)
-	GetUserBookings(context.Context, *GetUserBookingsRequest) (*GetUserBookingsResponse, error)
 	mustEmbedUnimplementedBookingServiceServer()
 }
 
@@ -306,14 +306,14 @@ type BookingServiceServer interface {
 type UnimplementedBookingServiceServer struct {
 }
 
+func (UnimplementedBookingServiceServer) GetUserBookings(context.Context, *GetUserBookingsRequest) (*GetUserBookingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserBookings not implemented")
+}
 func (UnimplementedBookingServiceServer) CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBooking not implemented")
 }
 func (UnimplementedBookingServiceServer) CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelBooking not implemented")
-}
-func (UnimplementedBookingServiceServer) GetUserBookings(context.Context, *GetUserBookingsRequest) (*GetUserBookingsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserBookings not implemented")
 }
 func (UnimplementedBookingServiceServer) mustEmbedUnimplementedBookingServiceServer() {}
 
@@ -326,6 +326,24 @@ type UnsafeBookingServiceServer interface {
 
 func RegisterBookingServiceServer(s grpc.ServiceRegistrar, srv BookingServiceServer) {
 	s.RegisterService(&BookingService_ServiceDesc, srv)
+}
+
+func _BookingService_GetUserBookings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserBookingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookingServiceServer).GetUserBookings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BookingService/GetUserBookings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookingServiceServer).GetUserBookings(ctx, req.(*GetUserBookingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _BookingService_CreateBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -364,24 +382,6 @@ func _BookingService_CancelBooking_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BookingService_GetUserBookings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserBookingsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BookingServiceServer).GetUserBookings(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/BookingService/GetUserBookings",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BookingServiceServer).GetUserBookings(ctx, req.(*GetUserBookingsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // BookingService_ServiceDesc is the grpc.ServiceDesc for BookingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -390,16 +390,16 @@ var BookingService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*BookingServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "GetUserBookings",
+			Handler:    _BookingService_GetUserBookings_Handler,
+		},
+		{
 			MethodName: "CreateBooking",
 			Handler:    _BookingService_CreateBooking_Handler,
 		},
 		{
 			MethodName: "CancelBooking",
 			Handler:    _BookingService_CancelBooking_Handler,
-		},
-		{
-			MethodName: "GetUserBookings",
-			Handler:    _BookingService_GetUserBookings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
