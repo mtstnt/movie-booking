@@ -29,6 +29,8 @@ services:
   
   employees:
     build: './services/employee'
+    depends_on:
+      - employees_db
   employees_db:
     image: postgres:14.3-alpine3.16
     environment:
@@ -38,6 +40,8 @@ services:
 
   bookings:
     build: './services/booking'
+    depends_on:
+      - bookings_db
   bookings_db:
     image: postgres:14.3-alpine3.16
     environment:
@@ -47,6 +51,8 @@ services:
 
   movies:
     build: './services/movie'
+    depends_on:
+      - movies_db
   movies_db:
     image: postgres:14.3-alpine3.16
     environment:

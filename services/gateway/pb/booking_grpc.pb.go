@@ -253,6 +253,7 @@ var ScheduleService_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookingServiceClient interface {
 	GetUserBookings(ctx context.Context, in *GetUserBookingsRequest, opts ...grpc.CallOption) (*GetUserBookingsResponse, error)
+	GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error)
 	CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*CreateBookingResponse, error)
 	CancelBooking(ctx context.Context, in *CancelBookingRequest, opts ...grpc.CallOption) (*CancelBookingResponse, error)
 }
@@ -268,6 +269,15 @@ func NewBookingServiceClient(cc grpc.ClientConnInterface) BookingServiceClient {
 func (c *bookingServiceClient) GetUserBookings(ctx context.Context, in *GetUserBookingsRequest, opts ...grpc.CallOption) (*GetUserBookingsResponse, error) {
 	out := new(GetUserBookingsResponse)
 	err := c.cc.Invoke(ctx, "/BookingService/GetUserBookings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookingServiceClient) GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error) {
+	out := new(GetBookingResponse)
+	err := c.cc.Invoke(ctx, "/BookingService/GetBooking", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -297,6 +307,7 @@ func (c *bookingServiceClient) CancelBooking(ctx context.Context, in *CancelBook
 // for forward compatibility
 type BookingServiceServer interface {
 	GetUserBookings(context.Context, *GetUserBookingsRequest) (*GetUserBookingsResponse, error)
+	GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error)
 	CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error)
 	CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error)
 	mustEmbedUnimplementedBookingServiceServer()
@@ -308,6 +319,9 @@ type UnimplementedBookingServiceServer struct {
 
 func (UnimplementedBookingServiceServer) GetUserBookings(context.Context, *GetUserBookingsRequest) (*GetUserBookingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserBookings not implemented")
+}
+func (UnimplementedBookingServiceServer) GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBooking not implemented")
 }
 func (UnimplementedBookingServiceServer) CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBooking not implemented")
@@ -342,6 +356,24 @@ func _BookingService_GetUserBookings_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BookingServiceServer).GetUserBookings(ctx, req.(*GetUserBookingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookingService_GetBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookingServiceServer).GetBooking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/BookingService/GetBooking",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookingServiceServer).GetBooking(ctx, req.(*GetBookingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -392,6 +424,10 @@ var BookingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserBookings",
 			Handler:    _BookingService_GetUserBookings_Handler,
+		},
+		{
+			MethodName: "GetBooking",
+			Handler:    _BookingService_GetBooking_Handler,
 		},
 		{
 			MethodName: "CreateBooking",

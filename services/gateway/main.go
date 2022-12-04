@@ -104,7 +104,6 @@ func run() error {
 			GET("/", bookingHandler.GetUserBookings).
 			GET("/:id", bookingHandler.GetBooking).
 			POST("/", bookingHandler.CreateBooking).
-			PUT("/:id", bookingHandler.UpdateBooking).
 			DELETE("/:id", bookingHandler.CancelBooking)
 	}
 

@@ -16,7 +16,10 @@ func NewRepository(db *gorm.DB) Repository {
 
 func (r Repository) GetMovies() ([]Movie, error) {
 	var movie []Movie
-	if err := r.db.Find(&movie).Error; err != nil {
+	if err := r.db.
+		Preload("Casts").
+		Preload("Director").
+		Find(&movie).Error; err != nil {
 		return nil, err
 	}
 	return movie, nil
@@ -24,7 +27,10 @@ func (r Repository) GetMovies() ([]Movie, error) {
 
 func (r Repository) GetMovie(id uint32) (Movie, error) {
 	var movie Movie
-	if err := r.db.First(&movie, "id = ?", id).Error; err != nil {
+	if err := r.db.
+		Preload("Casts").
+		Preload("Director").
+		First(&movie, "id = ?", id).Error; err != nil {
 		return movie, err
 	}
 	return movie, nil

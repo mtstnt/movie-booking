@@ -2,6 +2,8 @@ package filters
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"movie/gateway/helpers"
 	"movie/gateway/models"
 	"movie/gateway/pb"
@@ -17,17 +19,15 @@ func getAuthorizationToken(ctx *gin.Context) (string, error) {
 	var token string
 	authHeader := ctx.GetHeader("Authorization")
 	if authHeader == "" {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
 		return token, errors.New("empty authorization header")
 	}
 
 	authHeaderParts := strings.Split(authHeader, " ")
 	if len(authHeaderParts) < 2 {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{})
 		return token, errors.New("invalid authorization header")
 	}
 
-	token = authHeaderParts[0]
+	token = authHeaderParts[1]
 	return token, nil
 }
 
@@ -50,9 +50,15 @@ func AuthenticatedAsUser(userService pb.UserServiceClient, redisClient *redis.Cl
 			return
 		}
 
+		log.Println("AUTHORIZATION TOKEN: " + token)
+
 		redisCmd := redisClient.Get(ctx, token)
+		if redisCmd.Err() == redis.Nil {
+			helpers.HttpError(ctx, http.StatusUnauthorized, fmt.Errorf("session expired"))
+			return
+		}
 		if redisCmd.Err() != nil {
-			helpers.HttpError(ctx, http.StatusUnauthorized, err)
+			helpers.HttpError(ctx, http.StatusUnauthorized, redisCmd.Err())
 			return
 		}
 
@@ -77,7 +83,6 @@ func AuthenticatedAsUser(userService pb.UserServiceClient, redisClient *redis.Cl
 		}
 
 		ctx.Set("User", user)
-		ctx.Next()
 	}
 }
 

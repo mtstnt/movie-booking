@@ -77,17 +77,78 @@ func (b Booking) GetUserBookings(ctx *gin.Context) {
 }
 
 func (b Booking) GetBooking(ctx *gin.Context) {
+	user := ctx.Value("User").(models.User)
 
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	response, err := b.bookingClient.GetBooking(ctx, &pb.GetBookingRequest{
+		Id:     uint32(id),
+		UserID: user.ID,
+	})
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	booking := models.BookingFromProto(response.Booking)
+
+	helpers.HttpOK(ctx, gin.H{
+		"Booking": booking,
+	})
 }
 
 func (b Booking) CreateBooking(ctx *gin.Context) {
+	user := ctx.Value("User").(models.User)
 
-}
+	var req struct {
+		ScheduleID uint32
+	}
 
-func (b Booking) UpdateBooking(ctx *gin.Context) {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helpers.HttpError(ctx, http.StatusBadRequest, err)
+		return
+	}
 
+	response, err := b.bookingClient.CreateBooking(ctx, &pb.CreateBookingRequest{
+		UserID:     user.ID,
+		ScheduleID: req.ScheduleID,
+	})
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	booking := models.BookingFromProto(response.Booking)
+
+	helpers.HttpOK(ctx, gin.H{
+		"Booking": booking,
+	})
 }
 
 func (b Booking) CancelBooking(ctx *gin.Context) {
+	user := ctx.Value("User").(models.User)
 
+	var req struct {
+		BookingID uint32
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helpers.HttpError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	_, err := b.bookingClient.CancelBooking(ctx, &pb.CancelBookingRequest{
+		BookingID: req.BookingID,
+		UserID:    user.ID,
+	})
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.AbortWithStatus(http.StatusNoContent)
 }

@@ -40,7 +40,9 @@ def show_help() -> None:
 
 # Handle generate for specified service
 command_args = sys.argv[1:]
-if command_args[0].lower() == "gen": 
+if len(command_args) == 0:
+  gen(SERVICES)
+elif command_args[0].lower() == "gen": 
   gen(command_args[1:])
 elif command_args[0].lower() == "clean":
   clean(command_args[1:])

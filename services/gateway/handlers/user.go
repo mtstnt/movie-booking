@@ -128,20 +128,13 @@ func (u User) GetAllUsers(ctx *gin.Context) {
 }
 
 func (u User) GetUser(ctx *gin.Context) {
-	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
-	if err != nil {
-		helpers.HttpError(ctx, http.StatusBadRequest, err)
-		return
-	}
-
+	user := ctx.Value("User").(models.User)
 	response, err := u.userClient.GetUser(ctx, &pb.GetUserRequest{
-		Id: uint32(id),
+		Id: user.ID,
 	})
 	if err != nil {
 		helpers.HttpError(ctx, http.StatusBadRequest, err)
 	}
-
-	// TODO: Get history booking for user.
 
 	helpers.HttpOK(ctx, gin.H{
 		"User": models.User{

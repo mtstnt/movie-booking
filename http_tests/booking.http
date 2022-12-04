@@ -1,0 +1,8 @@
+POST /api/v1/bookings
+Host: localhost:8000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Njk5NDQ5NDMsImlhdCI6MTY2OTk0MTM0MywiVXNlcklEIjoxfQ.2BQZ7UsX7VMuzVb_ogSqG6x6sHRNRDpY-ZEv2dVEyIk
+Content-Type: application/json
+
+{
+  "ScheduleID": 1
+}

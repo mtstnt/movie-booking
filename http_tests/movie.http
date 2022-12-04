@@ -1,0 +1,15 @@
+GET /api/v1/movies
+Host: localhost:8000
+
+####
+POST /api/v1/movies
+Host: localhost:8000
+Content-Type: application/json
+
+{
+  "Title": "Testing",
+  "Synopsis": "Aaa",
+  "ReleaseDate": 123456789,
+  "DirectorID": 1,
+  "CastsID": [1, 2, 3]
+}

@@ -11,6 +11,7 @@ service ScheduleService {
 
 service BookingService {
   rpc GetUserBookings(GetUserBookingsRequest) returns (GetUserBookingsResponse) {}
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {}
   rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
 }
@@ -39,17 +40,9 @@ message CreateBookingResponse {
   Booking booking = 1;
 }
 
-message UpdateBookingRequest {
-  uint32 bookingID = 1;
-  uint32 userID = 2;
-  uint32 scheduleID = 3;
-}
-message UpdateBookingResponse {
-  Booking booking = 1;
-}
-
 message CancelBookingRequest {
   uint32 bookingID = 1;
+  uint32 userID = 2;
 }
 message CancelBookingResponse {}
 
@@ -61,6 +54,14 @@ message GetUserBookingsRequest {
 }
 message GetUserBookingsResponse {
   repeated Booking bookings = 1;
+}
+
+message GetBookingRequest {
+  uint32 id = 1;
+  uint32 userID = 2;
+}
+message GetBookingResponse {
+  Booking booking = 1;
 }
 
 message GetSchedulesRequest {
