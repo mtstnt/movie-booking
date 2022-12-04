@@ -1,0 +1,8 @@
+POST /api/v1/employees/signin
+Host: localhost:8000
+Content-Type: application/json
+
+{
+  "Username": "test_employee",
+  "Password": "123456"
+}

@@ -16,6 +16,10 @@ func main() {
 	}
 }
 
+func resetDB(db *gorm.DB) error {
+	return db.Migrator().DropTable("users")
+}
+
 func run() error {
 	listener, err := net.Listen("tcp", "0.0.0.0:8000")
 	if err != nil {
@@ -23,12 +27,15 @@ func run() error {
 	}
 
 	db, err := gorm.Open(
-		postgres.Open("host=users_db user=users password=users dbname=users port=5432 TimeZone=Asia/Jakarta"),
+		postgres.Open("host=users_db user=users password=users dbname=users port=5432"),
 	)
 	if err != nil {
 		return err
 	}
 
+	if err := resetDB(db); err != nil {
+		return err
+	}
 	if err := db.AutoMigrate(User{}); err != nil {
 		return err
 	}

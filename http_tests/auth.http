@@ -3,7 +3,7 @@ Host: localhost:8000
 Content-Type: application/json
 
 {
-  "Email": "test@mail.com",
+  "Email": "test@mailer.com",
   "Name": "testuser",
   "Password": "123456"
 }
@@ -14,6 +14,6 @@ Host: localhost:8000
 Content-Type: application/json
 
 {
-  "Email": "test@mail.com",
+  "Email": "test@mailer.com",
   "Password": "123456"
 }

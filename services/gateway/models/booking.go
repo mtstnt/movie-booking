@@ -10,10 +10,11 @@ type Booking struct {
 }
 
 type Schedule struct {
-	ID         uint32
-	MovieID    uint32
-	ShowTime   uint64
-	EmployeeID uint32
+	ID       uint32
+	MovieID  uint32
+	ShowTime uint64
+	StudioNo uint32
+	Capacity uint32
 }
 
 func BookingFromProto(b *pb.Booking) Booking {
@@ -22,5 +23,15 @@ func BookingFromProto(b *pb.Booking) Booking {
 		UserID:     b.UserID,
 		ScheduleID: b.ScheduleID,
 		IsCanceled: b.IsCanceled,
+	}
+}
+
+func ScheduleFromProto(b *pb.Schedule) Schedule {
+	return Schedule{
+		ID:       b.Id,
+		MovieID:  b.MovieID,
+		ShowTime: b.ShowTime,
+		StudioNo: b.StudioNo,
+		Capacity: b.Capacity,
 	}
 }

@@ -5,20 +5,22 @@ import (
 	"movie/booking/model"
 	"movie/booking/pb"
 	"movie/booking/repository"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type BookingServer struct {
 	pb.UnimplementedBookingServiceServer
 
-	bookingRepo repository.BookingRepo
+	bookingRepo  repository.BookingRepo
+	scheduleRepo repository.ScheduleRepo
 }
 
-func NewBookingServer(bookingRepo repository.BookingRepo) BookingServer {
+func NewBookingServer(
+	bookingRepo repository.BookingRepo,
+	scheduleRepo repository.ScheduleRepo,
+) BookingServer {
 	return BookingServer{
-		bookingRepo: bookingRepo,
+		bookingRepo:  bookingRepo,
+		scheduleRepo: scheduleRepo,
 	}
 }
 
@@ -38,10 +40,36 @@ func (s BookingServer) GetUserBookings(ctx context.Context, request *pb.GetUserB
 	}, nil
 }
 
-func (s BookingServer) CreateBooking(context.Context, *pb.CreateBookingRequest) (*pb.CreateBookingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateBooking not implemented")
+func (s BookingServer) CreateBooking(ctx context.Context, request *pb.CreateBookingRequest) (*pb.CreateBookingResponse, error) {
+	schedule, err := s.scheduleRepo.GetSchedule(request.ScheduleID)
+	if err != nil {
+		return nil, err
+	}
+
+	booking := model.Booking{
+		UserID:     request.UserID,
+		ScheduleID: uint32(schedule.ID),
+		IsCanceled: false,
+	}
+
+	if err := s.bookingRepo.CreateBooking(&booking); err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateBookingResponse{
+		Booking: model.BookingToProto(&booking),
+	}, nil
 }
 
-func (s BookingServer) CancelBooking(context.Context, *pb.CancelBookingRequest) (*pb.CancelBookingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CancelBooking not implemented")
+func (s BookingServer) CancelBooking(ctx context.Context, request *pb.CancelBookingRequest) (*pb.CancelBookingResponse, error) {
+	booking, err := s.bookingRepo.GetBooking(request.UserID, request.BookingID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.bookingRepo.DeleteBooking(&booking); err != nil {
+		return nil, err
+	}
+
+	return &pb.CancelBookingResponse{}, nil
 }

@@ -1,7 +1,15 @@
+GET /api/v1/schedules?from=10000&to=9999999999
+Host: localhost:8000
+
+####
 POST /api/v1/schedules
 Host: localhost:8000
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzAxNjAzMjYsImlhdCI6MTY3MDE1NjcyNiwiVXNlcklEIjoxfQ.FlxKXIBG1CXCiRsJZwvxv3i1fu7wD9_g9N5HeoUFbCY
 
 {
-  ""
+  "MovieID": 1,
+  "ShowTime": 100000000,
+  "StudioNo": 1,
+  "Capacity": 400
 }

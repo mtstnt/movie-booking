@@ -12,11 +12,15 @@ import (
 )
 
 type Booking struct {
-	bookingClient pb.BookingServiceClient
+	bookingClient  pb.BookingServiceClient
+	scheduleClient pb.ScheduleServiceClient
 }
 
-func NewBooking(bookingClient pb.BookingServiceClient) Booking {
-	return Booking{bookingClient}
+func NewBooking(
+	bookingClient pb.BookingServiceClient,
+	scheduleClient pb.ScheduleServiceClient,
+) Booking {
+	return Booking{bookingClient, scheduleClient}
 }
 
 func (b Booking) GetUserBookings(ctx *gin.Context) {
@@ -151,4 +155,108 @@ func (b Booking) CancelBooking(ctx *gin.Context) {
 	}
 
 	ctx.AbortWithStatus(http.StatusNoContent)
+}
+
+func (b Booking) GetSchedules(ctx *gin.Context) {
+	var from, to uint64 = 0, 0
+	var movieID uint64 = 0
+	var fromStr, toStr string
+
+	fromStr = ctx.Query("from")
+	if fromStr != "" {
+		var err error
+		from, err = strconv.ParseUint(fromStr, 10, 64)
+		if err != nil {
+			helpers.HttpError(ctx, http.StatusBadRequest, err)
+			return
+		}
+	}
+
+	toStr = ctx.Query("to")
+	if toStr != "" {
+		var err error
+		to, err = strconv.ParseUint(toStr, 10, 64)
+		if err != nil {
+			helpers.HttpError(ctx, http.StatusBadRequest, err)
+			return
+		}
+	}
+
+	movieIDStr := ctx.Query("movie")
+	if movieIDStr != "" {
+		var err error
+		movieID, err = strconv.ParseUint(movieIDStr, 10, 32)
+		if err != nil {
+			helpers.HttpError(ctx, http.StatusBadRequest, err)
+			return
+		}
+	}
+
+	response, err := b.scheduleClient.GetSchedules(ctx, &pb.GetSchedulesRequest{
+		From:    from,
+		To:      to,
+		MovieID: uint32(movieID),
+	})
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	schedules := []models.Schedule{}
+	for _, protoSchedule := range response.Schedules {
+		schedules = append(schedules, models.ScheduleFromProto(protoSchedule))
+	}
+
+	helpers.HttpOK(ctx, gin.H{
+		"Schedules": schedules,
+	})
+}
+
+func (b Booking) GetSchedule(ctx *gin.Context) {
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	response, err := b.scheduleClient.GetSchedule(ctx, &pb.GetScheduleRequest{
+		Id: uint32(id),
+	})
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	helpers.HttpOK(ctx, gin.H{
+		"Schedule": models.ScheduleFromProto(response.Schedule),
+	})
+}
+
+func (b Booking) CreateSchedule(ctx *gin.Context) {
+	var req struct {
+		MovieID  uint32
+		ShowTime uint64
+		Capacity uint32
+		StudioNo uint32
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helpers.HttpError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	response, err := b.scheduleClient.CreateSchedule(ctx, &pb.CreateScheduleRequest{
+		MovieID:  req.MovieID,
+		StudioNo: req.StudioNo,
+		Capacity: req.Capacity,
+		ShowTime: req.ShowTime,
+	})
+	if err != nil {
+		helpers.HttpError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+
+	helpers.HttpOK(ctx, gin.H{
+		"Schedule": models.ScheduleFromProto(response.Schedule),
+	})
 }

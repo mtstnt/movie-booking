@@ -48,11 +48,12 @@ func run() error {
 	movieClient := pb.NewMovieServiceClient(conns["movies"])
 	employeeClient := pb.NewEmployeeServiceClient(conns["employees"])
 	bookingClient := pb.NewBookingServiceClient(conns["bookings"])
+	scheduleClient := pb.NewScheduleServiceClient(conns["bookings"])
 
 	userHandler := handlers.NewUser(userClient, redisClient)
 	movieHandler := handlers.NewMovie(employeeClient, movieClient)
 	employeeHandler := handlers.NewEmployee(employeeClient, redisClient)
-	bookingHandler := handlers.NewBooking(bookingClient)
+	bookingHandler := handlers.NewBooking(bookingClient, scheduleClient)
 
 	userAuthenticatorMiddleware := filters.AuthenticatedAsUser(userClient, redisClient)
 	employeeAuthenticatorMiddleware := filters.AuthenticatedAsEmployee(employeeClient)
@@ -86,6 +87,8 @@ func run() error {
 			POST("/", movieHandler.CreateMovie).
 			PUT("/:id", movieHandler.UpdateMovie).
 			DELETE("/:id", movieHandler.DeleteMovie)
+
+		// TODO: Director, actor CRUD routes
 	}
 
 	{
@@ -96,6 +99,9 @@ func run() error {
 			POST("/", employeeHandler.CreateEmployee).
 			PUT("/:id", employeeHandler.UpdateEmployee).
 			DELETE("/:id", employeeHandler.DeleteEmployee)
+
+		rg.Group("/employees/signin").
+			POST("/", employeeHandler.SignIn)
 	}
 
 	{
@@ -105,6 +111,16 @@ func run() error {
 			GET("/:id", bookingHandler.GetBooking).
 			POST("/", bookingHandler.CreateBooking).
 			DELETE("/:id", bookingHandler.CancelBooking)
+	}
+
+	{
+		rg.Group("/schedules").
+			GET("/", bookingHandler.GetSchedules).
+			GET("/:id", bookingHandler.GetSchedule)
+
+		rg.Group("/schedules").
+			Use(filters.AuthenticatedAsEmployee(employeeClient)).
+			POST("/", bookingHandler.CreateSchedule)
 	}
 
 	return router.Run("0.0.0.0:8000")

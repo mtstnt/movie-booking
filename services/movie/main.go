@@ -23,7 +23,7 @@ func run() error {
 	}
 
 	db, err := gorm.Open(
-		postgres.Open("host=movies_db user=movies password=movies dbname=movies port=5432 TimeZone=Asia/Jakarta"),
+		postgres.Open("host=movies_db user=movies password=movies dbname=movies port=5432"),
 	)
 	if err != nil {
 		return err

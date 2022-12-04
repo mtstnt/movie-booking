@@ -19,6 +19,10 @@ func main() {
 	}
 }
 
+func resetDB(db *gorm.DB) error {
+	return db.Migrator().DropTable("schedules", "bookings")
+}
+
 func run() error {
 	listener, err := net.Listen("tcp", "0.0.0.0:8000")
 	if err != nil {
@@ -26,12 +30,15 @@ func run() error {
 	}
 
 	db, err := gorm.Open(
-		postgres.Open("host=bookings_db user=bookings password=bookings dbname=bookings port=5432 TimeZone=Asia/Jakarta"),
+		postgres.Open("host=bookings_db user=bookings password=bookings dbname=bookings port=5432"),
 	)
 	if err != nil {
 		return err
 	}
 
+	if err := resetDB(db); err != nil {
+		return err
+	}
 	if err := db.AutoMigrate(model.Schedule{}, model.Booking{}); err != nil {
 		return err
 	}
@@ -40,7 +47,7 @@ func run() error {
 	scheduleServer := server.NewScheduleServer(scheduleRepository)
 
 	bookingRepository := repository.NewBookingRepo(db)
-	bookingServer := server.NewBookingServer(bookingRepository)
+	bookingServer := server.NewBookingServer(bookingRepository, scheduleRepository)
 
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
