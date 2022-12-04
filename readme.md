@@ -31,6 +31,7 @@ This system consists of 6 services:
 - Some of the parts are not yet implemented: nginx as reverse proxy for serving API and static assets, notification service, etc.
 - Error messages are still not properly formatted for users, currently it is displaying Go error strings.
 - No automated unit or integration testing. Http tests are provided in `http_tests` directory and can be run with Vscode http client extension.
+- No Swagger/OpenAPI spec written yet..
 
 ## Running:
 1. Prerequisites: `docker` (docker compose installed) and `python3` (>3.8) installed.
